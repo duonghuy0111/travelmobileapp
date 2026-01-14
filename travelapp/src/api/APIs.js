@@ -11,7 +11,7 @@ export const endpoints = {
     bookings: '/bookings/', 
 };
 
-export const CLIENT_ID = 'sujnGcFe2mVDubIWoWnq0gvWg79RUdUBCQ1cxLXV'; 
+export const CLIENT_ID = 'JNoevMkuRxFPDPxaknWv9BIZ7FiUyikZGnLty3nV'; 
 export const CLIENT_SECRET = ''; 
 
 export const authApi = (accessToken) => axios.create({

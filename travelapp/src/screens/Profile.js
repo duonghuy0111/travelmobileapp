@@ -1,7 +1,7 @@
-import React, { useContext, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
-import { MyUserContext } from '../context/MyUserContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useContext } from 'react';
+import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { MyUserContext } from '../context/MyUserContext';
 
 const Profile = ({ navigation }) => {
     const [user, dispatch] = useContext(MyUserContext);

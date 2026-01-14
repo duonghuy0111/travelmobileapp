@@ -41,3 +41,5 @@ urlpatterns = [
 # Cấu hình để hiển thị ảnh khi chạy ở chế độ Debug (Localhost)
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+

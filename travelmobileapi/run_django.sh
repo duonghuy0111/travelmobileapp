@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# Thiết lập bảng mã UTF-8 cho hệ thống
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+
+# Ép Python phải đọc/ghi theo chuẩn UTF-8
+export PYTHONIOENCODING=utf-8
+
 echo "=== Cài đặt thư viện ==="
 pip install -r requirements.txt
 
@@ -22,7 +29,7 @@ from datetime import timedelta
 from travel.models import Category, TravelService, User # Lưu ý: Đổi 'courses' thành tên app của bạn nếu đã đổi
 
 # 1. Tạo một user đóng vai trò Nhà cung cấp (Provider) để đăng bài
-provider, created = User.objects.get_or_create(username='saigontourist', email='provider@test.com')
+provider, created = User.objects.get_or_create(username='saigontourist', email='saigon@test.com')
 if created:
     provider.set_password('123456')
     provider.first_name = 'Saigon'
@@ -32,10 +39,31 @@ if created:
     provider.save()
     print("Đã tạo tài khoản Nhà cung cấp: saigontourist / 123456")
 
+provider, created = User.objects.get_or_create(username='dalattourist', email='dalat@test.com')
+if created:
+    provider.set_password('123456')
+    provider.first_name = 'Da lat'
+    provider.last_name = 'Tourist'
+    provider.role = 'PROVIDER' # Đảm bảo model User có field role
+    provider.is_verified = True # Đã được duyệt
+    provider.save()
+    print("Đã tạo tài khoản Nhà cung cấp: dalattourist / 123456")
+
+provider, created = User.objects.get_or_create(username='sapatourist', email='sapa@test.com')
+if created:
+    provider.set_password('123456')
+    provider.first_name = 'Sapa'
+    provider.last_name = 'Tourist'
+    provider.role = 'PROVIDER' # Đảm bảo model User có field role
+    provider.is_verified = True # Đã được duyệt
+    provider.save()
+    print("Đã tạo tài khoản Nhà cung cấp: sapatourist / 123456")
+
 # 2. Tạo Danh mục (Category)
 c1, _ = Category.objects.get_or_create(name='Tour Du lịch')
 c2, _ = Category.objects.get_or_create(name='Khách sạn - Resort')
 c3, _ = Category.objects.get_or_create(name='Vé Máy bay - Tàu xe')
+
 
 # Link ảnh mẫu (dùng tạm ảnh trên mạng để demo đẹp)
 img_tour = 'https://res.cloudinary.com/dxxwcby8l/image/upload/v1709565062/rohn1l6xtpxedyqgyncs.png'
@@ -79,20 +107,6 @@ TravelService.objects.create(
     provider=provider
 )
 
-# Dịch vụ 3: Tour Sapa
-TravelService.objects.create(
-    name='Chinh phục đỉnh Fansipan - Sapa',
-    description='Trải nghiệm cáp treo, thăm bản Cát Cát, thưởng thức lẩu cá tầm.',
-    price=3200000,
-    location='Sapa, Lào Cai',
-    start_date=timezone.now() + timedelta(days=15),
-    duration='3 ngày 2 đêm',
-    slots_total=15,
-    slots_available=10,
-    image=img_tour,
-    category=c1,
-    provider=provider
-)
 
 # Dịch vụ 4: Khách sạn Mường Thanh
 TravelService.objects.create(
@@ -123,9 +137,61 @@ TravelService.objects.create(
     category=c3,
     provider=provider
 )
+# Dịch vụ 2: Tour Đà Nẵng - Hội An
+TravelService.objects.create(
+    name='Hành trình Di sản Miền Trung: Đà Nẵng - Hội An',
+    description='Tham quan Phố cổ Hội An, Chùa Cầu, tắm biển Mỹ Khê và khám phá Bà Nà Hills - Đường lên tiên cảnh.',
+    price=4200000,
+    location='Đà Nẵng - Quảng Nam',
+    start_date=timezone.now() + timedelta(days=15), # Khởi hành sau 15 ngày
+    duration='4 ngày 3 đêm',
+    slots_total=25,
+    slots_available=25,
+    image=img_tour, # Bạn có thể thay bằng biến ảnh khác nếu muốn
+    category=c1,
+    provider=provider
+)
+
+
+# Dịch vụ 4: Du thuyền Hạ Long
+TravelService.objects.create(
+    name='Du thuyền 5 sao Vịnh Hạ Long',
+    description='Nghỉ đêm trên du thuyền sang trọng, chèo thuyền Kayak, thăm hang Sửng Sốt và đảo Ti Tốp.',
+    price=6800000,
+    location='Hạ Long, Quảng Ninh',
+    start_date=timezone.now() + timedelta(days=20), # Khởi hành sau 20 ngày
+    duration='2 ngày 1 đêm',
+    slots_total=10, # Tour cao cấp ít chỗ hơn
+    slots_available=10,
+    image=img_tour,
+    category=c1,
+    provider=provider
+)
+
+
+
+# Dịch vụ 6: Tour Nha Trang
+TravelService.objects.create(
+    name='Khám phá biển đảo Nha Trang - VinWonders',
+    description='Lặn ngắm san hô tại Hòn Mun, vui chơi tại VinWonders và tắm bùn khoáng nóng.',
+    price=3900000,
+    location='Nha Trang, Khánh Hòa',
+    start_date=timezone.now() + timedelta(days=25),
+    duration='4 ngày 3 đêm',
+    slots_total=20,
+    slots_available=20,
+    image=img_tour,
+    category=c1,
+    provider=provider
+)
+
 
 print("=== Đã khởi tạo dữ liệu Du lịch thành công! ===")
 EOF
 
 echo "=== Chạy server Django ==="
 python manage.py runserver
+
+
+
+

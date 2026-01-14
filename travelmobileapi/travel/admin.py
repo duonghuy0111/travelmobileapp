@@ -4,10 +4,9 @@ from travel.models import Category, TravelService, Booking, User, Rating
 
 class UserAdmin(admin.ModelAdmin):
     list_display = ['username', 'role', 'is_verified', 'email', 'date_joined']
-    list_filter = ['role', 'is_verified'] # Bộ lọc để Admin dễ tìm Provider chưa duyệt
+    list_filter = ['role', 'is_verified']
     actions = ['approve_provider']
 
-    # Action nhanh: Duyệt nhà cung cấp
     def approve_provider(self, request, queryset):
         queryset.update(is_verified=True)
     approve_provider.short_description = "Duyệt Nhà cung cấp đã chọn"
@@ -31,3 +30,5 @@ admin.site.register(Category)
 admin.site.register(TravelService, TravelServiceAdmin)
 admin.site.register(Booking, BookingAdmin)
 admin.site.register(Rating)
+
+

@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Category, TravelService, User, Booking, Rating
 
+from .models import Like
 
 # 1. Serializer cho User (Dùng để đăng ký và hiển thị thông tin)
 class UserSerializer(serializers.ModelSerializer):
@@ -26,42 +27,29 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ['id', 'name']
 
 
-# 3. Serializer cho Tour (Quan trọng nhất)
 class TravelServiceSerializer(serializers.ModelSerializer):
-    # Lấy thêm thông tin chi tiết thay vì chỉ hiện ID
-    category_id = serializers.IntegerField(write_only=True)  # Nhập vào ID
-    category = CategorySerializer(read_only=True)  # Trả ra object chi tiết
+    category_id = serializers.IntegerField(write_only=True)
+    category = CategorySerializer(read_only=True)
 
-    # Hiển thị thông tin nhà cung cấp gọn nhẹ (chỉ cần tên và avatar)
-    provider = UserSerializer(read_only=True)
+    # Field tính toán (read_only)
+    avg_rating = serializers.FloatField(read_only=True)  # Điểm trung bình
+    booking_count = serializers.IntegerField(read_only=True)  # Số lượt đặt
 
-    # Xử lý đường dẫn ảnh đầy đủ
-    image = serializers.SerializerMethodField()
-
-    def get_image(self, obj):
-        if obj.image:
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(obj.image.url)
-            return obj.image.url
-        return None
+    def to_representation(self, instance):
+        # Hàm này giúp hiển thị full link ảnh nếu cần
+        rep = super().to_representation(instance)
+        if instance.image:
+            rep['image'] = instance.image.url
+        return rep
 
     class Meta:
         model = TravelService
         fields = ['id', 'name', 'description', 'price', 'location',
-                  'start_date', 'duration', 'slots_total', 'slots_available',
-                  'image', 'category', 'category_id', 'provider', 'active']
+                  'start_date', 'end_date', 'duration',  # Nhớ thêm end_date
+                  'slots_total', 'slots_available', 'image',
+                  'category', 'category_id', 'provider', 'active',
+                  'avg_rating', 'booking_count']  # Thêm vào fields
 
-
-# # 4. Serializer cho Booking (Đặt vé)
-# class BookingSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Booking
-#         fields = ['id', 'user', 'service', 'quantity', 'total_price',
-#                   'status', 'payment_method', 'created_date']
-
-
-# ... (Các serializer khác giữ nguyên)
 
 class BookingSerializer(serializers.ModelSerializer):
     # Cho phép hiển thị thông tin Service chi tiết khi xem đơn hàng

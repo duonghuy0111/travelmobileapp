@@ -1,19 +1,3 @@
-# from django.urls import path, include
-# from rest_framework.routers import DefaultRouter
-# from . import views
-#
-# # Tạo Router để tự động sinh ra các đường dẫn API
-# router = DefaultRouter()
-# router.register('categories', views.CategoryViewSet)
-# router.register('services', views.TravelServiceViewSet)
-# router.register('users', views.UserViewSet)
-# router.register('bookings', views.BookingViewSet)
-#
-# urlpatterns = [
-#     path('', include(router.urls)),
-# ]
-
-
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from . import views
@@ -31,3 +15,5 @@ router.register('stats', views.StatsViewSet, basename='stats')
 urlpatterns = [
     path('', include(router.urls)),
 ]
+
+

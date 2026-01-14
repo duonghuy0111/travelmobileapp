@@ -1,6 +1,5 @@
-import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import moment from 'moment';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const TourItem = ({ item, onPress }) => {
     return (

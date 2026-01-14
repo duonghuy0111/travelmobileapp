@@ -28,27 +28,26 @@ const Login = ({ navigation, route }) => { // 👇 Thêm route để nhận tham
             });
 
             await AsyncStorage.setItem("access-token", res.data.access_token);
-            let userRes = await authApi(res.data.access_token).get(endpoints['current-user']);
+            let userRes = await authApi(res.data.access_token).get(endpoints['current_user']);
             
             console.log("🔥 CHECK SERVER TRẢ VỀ:", JSON.stringify(userRes.data, null, 2));
 
+                        // 1. Lưu user vào Context
             dispatch({
                 type: "login",
-                payload: userRes.data
+                payload: user
             });
 
-            // 👇 LOGIC ĐIỀU HƯỚNG THÔNG MINH
-            if (params.previousScreen === "TourDetail") {
-                // Nếu đến từ trang Chi tiết Tour, thì quay lại đó kèm theo tourId
-                navigation.navigate("Home", { 
-                    screen: "HomeTab", 
-                    params: { 
-                        screen: "TourDetail", 
-                        params: { tourId: params.tourId } 
-                    }
-                });
+            // 2. Kiểm tra Role để chuyển hướng đúng nơi
+            // (Giả sử backend trả về field 'role' là 'provider' hoặc 'customer')
+            // Hoặc nếu bạn dùng field 'is_staff', hãy thay đổi điều kiện bên dưới cho phù hợp
+            if (user.role === 'PROVIDER' || user.is_staff === true) { 
+                // Nếu là Provider -> Chuyển sang màn hình Thống kê hoặc Kho tour
+                console.log("Đăng nhập thành công: Chào Provider!");
+                navigation.navigate("ProviderMain"); 
             } else {
-                // Nếu đăng nhập bình thường thì về Home
+                // Nếu là Khách hàng -> Chuyển về Home
+                console.log("Đăng nhập thành công: Chào Khách hàng!");
                 navigation.navigate("Home");
             }
 

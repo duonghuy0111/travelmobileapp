@@ -1,9 +1,9 @@
-import React, { useState, useContext } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Alert, ActivityIndicator, ScrollView } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
-import { MyUserContext } from '../context/MyUserContext';
-import API, { authApi, endpoints } from '../api/APIs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as ImagePicker from 'expo-image-picker';
+import { useContext, useState } from 'react';
+import { ActivityIndicator, Alert, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { authApi, endpoints } from '../api/APIs';
+import { MyUserContext } from '../context/MyUserContext';
 
 const ProfileUpdate = ({ navigation }) => {
     const [user, dispatch] = useContext(MyUserContext);

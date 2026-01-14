@@ -17,7 +17,6 @@ from django.conf.global_settings import AUTH_USER_MODEL
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
@@ -29,16 +28,15 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
 
 # --- CẤU HÌNH CLOUDINARY (Thêm đoạn này vào cuối file) ---
 cloudinary.config(
-  cloud_name = "dvcbfmzdl",
-  api_key = "199126856568642",
-  api_secret = "0MWxdhI4j6d12sSQbZmiGWj1OHk"
+    cloud_name="dvcbfmzdl",
+    api_key="199126856568642",
+    api_secret="0MWxdhI4j6d12sSQbZmiGWj1OHk"
 )
 
 # Application definition
@@ -50,10 +48,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-# --- Thư viện bên thứ 3 ---
+    # --- Thư viện bên thứ 3 ---
     'rest_framework',
     'oauth2_provider',  # <--- Yêu cầu bắt buộc của đề bài (OAuth2)
-    'corsheaders',      # Để React Native gọi được API
+    'corsheaders',  # Để React Native gọi được API
     'ckeditor',
     'ckeditor_uploader',
     'cloudinary',
@@ -93,15 +91,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'travelmobileapi.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 DATABASES = {
     'default': {
-'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.mysql',
         'NAME': 'traveldb',  # <--- SỬA THÀNH TÊN MỚI Ở ĐÂY
-        'USER': 'root',      # Kiểm tra lại user MySQL của bạn
+        'USER': 'root',  # Kiểm tra lại user MySQL của bạn
         'PASSWORD': 'root',  # Kiểm tra lại mật khẩu MySQL của bạn
         'HOST': 'localhost',
         'PORT': '3306',
@@ -123,7 +120,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Thư mục con bên trong media để chứa ảnh của bài viết
 CKEDITOR_UPLOAD_PATH = "uploads/"
 
-
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
 
@@ -142,7 +138,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
@@ -153,7 +148,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
@@ -175,5 +169,5 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10,
+    'PAGE_SIZE': 20,
 }

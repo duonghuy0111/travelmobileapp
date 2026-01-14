@@ -1,16 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from ckeditor.fields import RichTextField
-# from cloudinary.models import CloudinaryField
+from cloudinary.models import CloudinaryField
 
 
 class User(AbstractUser):
-    """
-    User model tùy chỉnh theo đề bài:
-    - 3 Vai trò: Admin, Provider, Customer.
-    - Avatar: Bắt buộc (nhưng để null=True lúc dev cho dễ).
-    - is_verified: Quan trọng cho Provider (Admin duyệt mới được đăng bài).
-    """
 
     class Role(models.TextChoices):
         ADMIN = "ADMIN", "Quản trị viên"
@@ -20,10 +14,9 @@ class User(AbstractUser):
     # avatar = CloudinaryField('avatar', null=True)
     avatar = models.ImageField(upload_to='avatars/%Y/%m', null=True)
     role = models.CharField(max_length=20, choices=Role.choices, default=Role.CUSTOMER)
-    is_verified = models.BooleanField(default=False)  # Admin duyệt Provider tại đây
+    is_verified = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
-        # Nếu là Admin thì auto verified
         if self.is_superuser:
             self.role = self.Role.ADMIN
             self.is_verified = True
@@ -32,7 +25,7 @@ class User(AbstractUser):
 
 class BaseModel(models.Model):
     active = models.BooleanField(default=True)
-    created_date = models.DateTimeField(auto_now_add=True)  # Phục vụ thống kê doanh thu theo tháng/quý
+    created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
 
     class Meta:
@@ -40,47 +33,38 @@ class BaseModel(models.Model):
 
 
 class Category(BaseModel):
-    # Phân loại: Tour du lịch, Khách sạn, Vé máy bay...
     name = models.CharField(max_length=50, unique=True)
 
     def __str__(self):
         return self.name
 
-
 class TravelService(BaseModel):
-    """
-    Bảng Dịch vụ (Tour/Khách sạn/Vé).
-    Nhà cung cấp chỉ được tạo khi User.is_verified = True
-    """
     name = models.CharField(max_length=255)
-    description = RichTextField()  # Mô tả chi tiết (HTML)
-    price = models.DecimalField(max_digits=12, decimal_places=0)  # Giá tiền (VND)
-    location = models.CharField(max_length=255)  # Địa điểm (phục vụ tìm kiếm)
+    description = RichTextField()
+    price = models.DecimalField(max_digits=12, decimal_places=0)
+    location = models.CharField(max_length=255)
 
-    start_date = models.DateTimeField()  # Thời gian khởi hành
-    duration = models.CharField(max_length=100)  # VD: 3N2Đ
+    # Sửa: Thêm end_date để hỗ trợ Khách sạn (Check-in/Check-out)
+    start_date = models.DateTimeField()  # Tour: Ngày đi | Hotel: Check-in
+    end_date = models.DateTimeField(null=True, blank=True)  # Tour: Ngày về | Hotel: Check-out
 
-    slots_total = models.IntegerField(default=20)  # Tổng chỗ
-    slots_available = models.IntegerField(default=20)  # Chỗ còn trống
+    duration = models.CharField(max_length=50, null=True, blank=True)  # Ví dụ: "3N2Đ"
+    slots_total = models.IntegerField(default=10)
+    slots_available = models.IntegerField(default=10)
 
-    # image = CloudinaryField('image', null=True)
-    image = models.ImageField(upload_to='services/%Y/%m', null=True)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    provider = models.ForeignKey(User, on_delete=models.CASCADE, related_name='services')
+    image = models.ImageField(upload_to='services/%Y/%m', null=True)  # Hoặc CloudinaryField
+
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='services')
+    provider = models.ForeignKey(User, on_delete=models.CASCADE, related_name='provided_services')
 
     def __str__(self):
         return self.name
 
-
 class Booking(BaseModel):
-    """
-    Bảng Đặt vé.
-    Lưu trữ thông tin thanh toán mở rộng (Tiền mặt, MoMo, ZaloPay...)
-    """
 
     class Status(models.TextChoices):
         PENDING = 'PENDING', 'Chờ thanh toán'
-        CONFIRMED = 'CONFIRMED', 'Đã xác nhận'  # Sau khi Provider duyệt hoặc thanh toán xong
+        CONFIRMED = 'CONFIRMED', 'Đã xác nhận'
         CANCELLED = 'CANCELLED', 'Đã hủy'
 
     class PaymentMethod(models.TextChoices):
@@ -92,8 +76,8 @@ class Booking(BaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     service = models.ForeignKey(TravelService, on_delete=models.CASCADE)
 
-    quantity = models.IntegerField(default=1)  # Số lượng khách
-    total_price = models.DecimalField(max_digits=12, decimal_places=0)  # Tổng tiền
+    quantity = models.IntegerField(default=1)
+    total_price = models.DecimalField(max_digits=12, decimal_places=0)
 
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
     payment_method = models.CharField(max_length=20, choices=PaymentMethod.choices, default=PaymentMethod.CASH)
@@ -103,10 +87,6 @@ class Booking(BaseModel):
 
 
 class Rating(BaseModel):
-    """
-    Phản hồi & Đánh giá.
-    Giúp Provider nâng cao chất lượng dịch vụ.
-    """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     service = models.ForeignKey(TravelService, on_delete=models.CASCADE, related_name='ratings')
     rate = models.SmallIntegerField(default=5)  # 1-5 sao
@@ -116,3 +96,11 @@ class Rating(BaseModel):
 
     def __str__(self):
         return f"{self.user.username} - {self.rate} sao"
+
+
+class Like(BaseModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    service = models.ForeignKey(TravelService, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('user', 'service')
